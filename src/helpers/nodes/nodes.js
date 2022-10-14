@@ -216,7 +216,7 @@ const getNodeData = (selectedProject) => {
     id: index,
     name: node.data.name,
     module: node.data.module,
-    incompleteResources: node.data.incompleteResources,
+    incomompleteProperties: node.data.incomompleteProperties,
   }));
 };
 
@@ -233,12 +233,12 @@ const getRelationData = (selectedProject) => {
       source: edge.data.source,
       target: edge.data.target,
       relation: getRelationType(edge.scratch.relation),
-      dms: edge.hasOwnProperty('metrics') ? edge.metrics.DMS.value : null,
-      abstractness: edge.hasOwnProperty('metrics') ? edge.metrics.abstractness?.value : null,
-      coupling: edge.hasOwnProperty('metrics') ? edge.metrics.coupling.value : null,
-      // instability: edge.metrics.instability?.value,
-      // nameResemblance: edge.metrics.nameResemblance?.value,
-      // packageMapping: edge.metrics.packageMapping?.value,
+      dms: edge.hasOwnProperty('metrics') ? edge.metrics.DMS.value : 'No Calculado',
+      abstractness: edge.hasOwnProperty('metrics') ? edge.metrics.abstractness?.value : 'No Calculado',
+      coupling: edge.hasOwnProperty('metrics') ? edge.metrics.coupling.value : 'No Calculado',
+      instability: edge.hasOwnProperty('metrics') ? edge.metrics.instability?.value : 'No Calculado',
+      nameRessemblance: edge.hasOwnProperty('metrics') ? edge.metrics.nameRessemblance?.value : 'No Calculado',
+      packageMapping: edge.hasOwnProperty('metrics') ? edge.metrics.packageMapping?.value : 'No Calculado',
     };
   })
 };
@@ -270,3 +270,7 @@ export default {
   removeNode,
   repaintEdges,
 };
+
+export {
+  repaintEdges
+}
