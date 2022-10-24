@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ModalMessage } from "../../components/ModalMessage/ModalMessage";
 
 /**
@@ -8,6 +9,7 @@ import { ModalMessage } from "../../components/ModalMessage/ModalMessage";
  * @param {Function} setSelectedProject funcion para actualizar proyecto seleccionado
  * @param {Function} setReloadSidebar funcion para actualizar estado del Sidebar
  */
+/** */
 const manageErrors = async (error) => {
   let title = "";
   let text = "";

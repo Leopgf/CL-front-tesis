@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useContext, useState, useEffect } from "react";
 import "./Content.css";
 
@@ -20,13 +21,13 @@ const Content = () => {
   const [elementos, setElementos] = useState();
   const [load, setLoad] = useState(false);
   const {
-    selectedProject, setSelectedProject,
+    selectedProject,
     cy, setCy,
     selectedNodes, setSelectedNodes,
     setSelectionModel,
   } = useContext(AppContext);
 
-  /**
+    /**
    * Obtener el tipo de relación
    * @param {JSON} ele Objeto de cytoscape
    * @returns String tipo de label
@@ -199,6 +200,7 @@ const Content = () => {
               }
               labelPlacement="start"
               style={{ marginRight: 5 }}
+              label = ""
             />
           </div>
 

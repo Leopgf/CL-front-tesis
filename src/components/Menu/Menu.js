@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useContext } from "react";
 import AppContext from "../../auth/context/context";
 import {

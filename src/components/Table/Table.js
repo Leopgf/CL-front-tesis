@@ -12,7 +12,7 @@ import "./table.css"
 import TableItem from "../TableItem/TableItem";
 
 /**
- * Componente que representa 
+ * Componente que representa
  * al contenedor de tabs con tablas
  * del proyecto selecionado
  */
@@ -70,7 +70,7 @@ const useStyles = makeStyles((theme) => ({
     position: "absolute",
     bottom: 0,
     right: 0,
-    marginRight: 25,
+    // marginRight: 25,
     backgroundColor: "var(--primaryDark)",
     borderEndEndRadius: 0,
     borderEndStartRadius: 0,

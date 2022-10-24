@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import SwipeableViews from "react-swipeable-views";
@@ -62,7 +63,7 @@ const TableItem = () => {
   /**
    * Manejador de eventos sobre
    * cambios en tabs
-   * @param {Event} event 
+   * @param {Event} event
    * @param {int} newValue nuevo indice
    */
   const handleChange = (event, newValue) => {

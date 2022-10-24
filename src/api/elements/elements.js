@@ -18,6 +18,17 @@ const postElements = async (formData) => {
     }
 }
 
+const postUpdatedElements = async (formData) => {
+  try {
+    const response = await axios.post('/updated-elements/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.status;
+  }
+};
+
 export {
-    postElements,
+    postElements, postUpdatedElements
 }

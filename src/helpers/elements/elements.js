@@ -1,4 +1,4 @@
-import { postElements } from "../../api/elements/elements";
+import { postElements, postUpdatedElements } from '../../api/elements/elements';
 import { manageErrors } from "../errors/errors";
 import { ModalMessage } from "../../components/ModalMessage/ModalMessage";
 
@@ -9,7 +9,7 @@ import { ModalMessage } from "../../components/ModalMessage/ModalMessage";
  * @param {JSON} selectedProject objeto con información del proyecto seleccionado
  * @param {Function} setSelectedProject funcion para actualizar proyecto seleccionado
  */
-const manageResponse = (response, selectedProject, setSelectedProject, setReloadSidebar) => {  
+const manageResponse = (response, selectedProject, setSelectedProject, setReloadSidebar) => {
   if (Number.isInteger(response)) {
     setReloadSidebar(false);
     manageErrors(response)
@@ -29,6 +29,50 @@ const manageResponse = (response, selectedProject, setSelectedProject, setReload
   }
 };
 
+const manageUpdatedResponse = (
+  response,
+  selectedProject,
+  setSelectedProject,
+) => {
+  if (Number.isInteger(response)) {
+    manageErrors(response);
+  } else {
+    setSelectedProject({
+      ...selectedProject,
+      elements: response.elements,
+    });
+  }
+};
+
+const manageElementsUpdate = async(
+  user,
+  selectedProject,
+  setSelectedProject,
+) => {
+  const response = await updatedElements(user, selectedProject)
+  manageUpdatedResponse(
+    response,
+    selectedProject,
+    setSelectedProject,
+  );
+};
+
+const updatedElements = async (user, selectedProject) => {
+  const formData = getFormUpdatedData(user, selectedProject);
+  const response = await postUpdatedElements(formData);
+  return response;
+};
+const getFormUpdatedData = (user, selectedProject) => {
+  const formData = new FormData();
+  formData.append('user_id', user.uid);
+  formData.append('ver_index', selectedProject.verIndex);
+  formData.append('arc_index', selectedProject.arcIndex);
+  formData.append('project_index', selectedProject.projectIndex);
+  return formData;
+};
+
+
+export { postElements };
 /**
  * Llamada a la API para agregar nuevos elementos a una
  * versión de una arquitectura
@@ -89,4 +133,4 @@ const addFile = (file, formData) => {
   file.remove();
 };
 
-export { manageElementsSubmit };
+export { manageElementsSubmit, manageElementsUpdate };

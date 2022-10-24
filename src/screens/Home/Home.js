@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useContext, useState, useEffect } from "react";
 import "./Home.css";
 import { makeStyles } from "@material-ui/core/styles";

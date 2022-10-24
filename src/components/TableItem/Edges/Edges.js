@@ -1,10 +1,12 @@
 import React, { useContext, useState, useEffect } from "react";
 import { DataGrid } from "@material-ui/data-grid";
-import {
-  putMetrics,
-} from "../../../api/metrics/metrics";
+// import { putMetrics } from "../../../api/metrics/metrics";
 
-import { ManageMetrics } from "../../../helpers/metrics/metrics"
+import {
+  ManageMetrics,
+  ManageCombineMetrics,
+  ManageCreateCompositeComponent,
+} from '../../../helpers/metrics/metrics';
 
 import AppContext from "../../../auth/context/context";
 import Loader from "../../Loader/Loader";
@@ -12,45 +14,64 @@ import nodeHelper from "../../../helpers/nodes/nodes";
 import "./inputs.css";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import { Button } from "@material-ui/core";
+import { manageElementsUpdate } from '../../../helpers/elements/elements';
 
 /**
  * Componente que representa
  * la tabla de aristas del proyecto selecionado
  */
+
+
 const EdgesTable = () => {
-  const { user, selectedProject, setReloadSidebar } = useContext(AppContext);
+  const { user, selectedProject, setSelectedProject, elements/*setReloadSidebar*/ } = useContext(AppContext);
   const [loader, setLoader] = useState(true);
 
   const columns1 = [
-    { field: "id", headerName: "ID", width: 70 },
-    { field: "source", headerName: "Origen", width: 300 },
-    { field: "target", headerName: "Destino", width: 300 },
-    { field: "relation", headerName: "Relación", width: 200 },
-    { field: "coupling", headerName: "Coupling", width: 200 },
-    { field: "abstractness", headerName: "Abstracción", width: 200 },
-    { field: "instability", headerName: "Inestabilidad", width: 200 },
-    { field: "dms", headerName: "DMS", width: 200 },
-    { field: "nameRessemblance", headerName: "Semejanza de Nombre", width: 200 },
-    { field: "packageMapping", headerName: "Mapeo de Paquetes", width: 200 },
-    { field: "q", headerName: "Q", width: 250 },
-    { field: "answer", headerName: "Candidato a Compuesto?", width: 250 },
-
+    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'source', headerName: 'Origen', width: 180 },
+    { field: 'target', headerName: 'Destino', width: 180 },
+    { field: 'relation', headerName: 'Relación', width: 150 },
+    { field: 'coupling', headerName: 'Coupling', width: 150 },
+    { field: 'abstractness', headerName: 'Abstracción', width: 180 },
+    { field: 'instability', headerName: 'Inestabilidad', width: 180 },
+    { field: 'dms', headerName: 'DMS', width: 150 },
+    {
+      field: 'nameRessemblance',
+      headerName: 'Semejanza de Nombre',
+      width: 180,
+    },
+    { field: 'packageMapping', headerName: 'Mapeo de Paquetes', width: 180 },
+    { field: 'overall_q', headerName: 'Q', width: 100 },
+    // { field: 'answer', headerName: 'Candidato a Compuesto?', width: 250 },
   ];
 
   // Getting the values of each input fields
   const [dms, setDms] = useState(15);
   const [nameResemblance, setNameResemblance] = useState(35);
-  const [packageMapping, setPackageMapping] = useState(35);
-  const [umbralName, setUmbralName] = useState(35);
-  const [umbralCoupling, setUmbralCoupling] = useState(0.65);
-  const [umbral, setUmbral] = useState(0.4);
-  const [sum, setSum] = useState(dms + nameResemblance + packageMapping);
-  let total = (dms + nameResemblance + packageMapping)
+  const [packageMapping, setPackageMapping] = useState(25);
+  const [umbralName, setUmbralName] = useState(40);
+  const [umbralCoupling, setUmbralCoupling] = useState(65);
+  const [umbral, setUmbral] = useState(0.01);
+  // const [sum, setSum] = useState(dms + nameResemblance + packageMapping);
+  // let total = (dms + nameResemblance + packageMapping)
+  const [sum, setSum] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [weighing, setWeighing ] = useState({
+    dms: dms,
+    coupling: umbralCoupling,
+    name_resemblance: nameResemblance,
+    package_mapping: packageMapping
+  })
+  const [render, setRender] = useState(false)
+
+
 
   // Calculate the sum total of all the input fields
   function calculateTotal() {
-    setSum(dms + nameResemblance + packageMapping);
-    total = sum;
+    const _sum = dms + nameResemblance + packageMapping;
+    setSum(_sum);
+    setTotal(sum);
+    console.log('Se calcularon las metricas')
   }
 
   // Getting all the nodes and mapping through each item
@@ -67,74 +88,56 @@ const EdgesTable = () => {
   let edgesDos = nodeHelper.getRelationData(selectedProject);
 
   // For loop to get the Q and answer
+  function calculatelistas(){
+    ManageCreateCompositeComponent(user, selectedProject, umbral);
+  }
 
-  if (sum <= 100) {
-    for (let i = 0; i < edgesDos.length; i++) {
-      let flag1 = false;
-      let flag2 = false;
-      let dividen1 = 0;
-      let dividen2 = 0;
-      for (let j = 0; j < nodesDos.length; j++) {
-        if (
-          nodesDos[j].id === edgesDos[i].source &&
-          nodesDos[j].incomompleteProperties
-        ) {
-
-          flag1 = true;
-          edgesDos[i].q = 0;
-          edgesDos[i].answer = "No Aplica";
-        }
-        if (
-          nodesDos[j].id === edgesDos[i].target && nodesDos[j].incomompleteProperties) {
-          flag2 = true;
-          edgesDos[i].q = 0;
-          edgesDos[i].answer = "No Aplica";
-        }
-        if (flag1 || flag2) {
-          break;
-        }
-      }
-      if (!flag1 && !flag2) {
-
-        console.log("partida " + edgesDos[i].source + "llegada " + edgesDos[i].target)
-        console.log("Nombre: " + edgesDos[i].nameRessemblance + " Mapeo " + edgesDos[i].packageMapping)
-
-        if (edgesDos[i].coupling >= umbralCoupling) {
-          dividen1 =
-            edgesDos[i].nameRessemblance * nameResemblance;
-        }
-
-        dividen1 = dividen1 + edgesDos[i].packageMapping * packageMapping;
-        dividen2 = edgesDos[i].dms * dms;
-
-        let q = (dividen1 - dividen2) / sum;
-        edgesDos[i].q = q.toFixed(2);
-
-        if (q >= umbral) {
-          edgesDos[i].answer = "Si";
-        } else {
-          edgesDos[i].answer = "No";
-        }
-      } else {
-        edgesDos[i].q = 'Imposible Calcular'
-        edgesDos[i].answer = 'Imposible Concluir'
-
-      }
-
-    }
+  async function combineMetrics(setRender, render) {
+    const q = await ManageCombineMetrics(user, selectedProject, weighing);
+    console.log(q)
+    setRender(!render);
+    // for (const e in edgesDos) {
+    //   console.log(e)
+    //   edgesDos[e].q = q[e]
+    // }
+    return q
   }
 
   useEffect(() => {
     setLoader(false);
   }, [selectedProject.elements]);
 
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  useEffect(()=>{
+    console.log("ENTRO RENDER")
+    manageElementsUpdate(
+      user,
+      selectedProject,
+      setSelectedProject,
+    );
+    console.log("selectedProject.elements.edges")
+    console.log(selectedProject.elements.edges);
+    edgesDos = nodeHelper.getRelationData(selectedProject);
+    console.log("edgesDos STATE")
+    console.log(edgesDos);
+  },[render])
+
+  useEffect(() => {
+    console.log('Calculo de metricas')
+    setWeighing({
+       dms: dms,
+       coupling: umbralCoupling,
+       name_resemblance: nameResemblance,
+       package_mapping: packageMapping,
+     });
+    return calculateTotal();
+  }, [dms, nameResemblance, packageMapping, umbralCoupling]);
+  // const [open, setOpen] = React.useState(false);
+  // const handleOpen = () => setOpen(true);
+  // const handleClose = () => setOpen(false);
 
 
   return (
-    <div style={{ height: "80vh", width: "100%" }}>
+    <div style={{ height: '80vh', width: '100%' }}>
       <div className="form-wrapper">
         <form className="form-umbral">
           <div className="input-align-umbral">
@@ -146,13 +149,19 @@ const EdgesTable = () => {
               type="number"
               min="0"
               max="1"
-              onChange={(e) => setUmbralName(e.target.value)}
+              onChange={(e) => {
+                e.preventDefault();
+                setUmbralName(Number(e.target.value));
+              }}
             />
             <label className="input-label">Umbral Semejanza</label>
           </div>
           <div className="btn-total">
-            <Button onClick={ ManageMetrics(user, selectedProject, umbralName)} variant="contained">
-              Calcular Métricas
+            <Button onClick={calculateTotal} variant="contained">
+              Calcular
+            </Button>
+            <Button onClick={()=>calculatelistas()} variant="contained">
+              Calcular222
             </Button>
           </div>
         </form>
@@ -163,8 +172,9 @@ const EdgesTable = () => {
               <input
                 value={dms}
                 onChange={(e) => {
-                  setDms(+e.target.value)
-                  calculateTotal()
+                  e.preventDefault();
+                  setDms(+e.target.value);
+                  calculateTotal();
                 }}
                 className="input-styles"
                 placeholder="ejm. 15"
@@ -179,8 +189,9 @@ const EdgesTable = () => {
                 name="semejanza"
                 value={nameResemblance}
                 onChange={(e) => {
-                  setNameResemblance(+e.target.value)
-                  calculateTotal()
+                  e.preventDefault();
+                  setNameResemblance(+e.target.value);
+                  calculateTotal();
                 }}
               />
               <label className="input-label">Peso Semejanza de Nombre</label>
@@ -192,8 +203,9 @@ const EdgesTable = () => {
                 name="paquete"
                 value={packageMapping}
                 onChange={(e) => {
-                  setPackageMapping(+e.target.value)
-                  calculateTotal()
+                  e.preventDefault();
+                  setPackageMapping(+e.target.value);
+                  calculateTotal();
                 }}
               />
               <label className="input-label">Peso Mapeo de Paquete</label>
@@ -205,7 +217,10 @@ const EdgesTable = () => {
                 name="umbral"
                 value={umbralName}
                 type="text"
-                onChange={(e) => setUmbralName(e.target.value)}
+                onChange={(e) => {
+                  e.preventDefault();
+                  setUmbralName(Number(e.target.value));
+                }}
               />
               <label className="input-label">Umbral Semejanza</label>
             </div>
@@ -216,7 +231,10 @@ const EdgesTable = () => {
                 name="umbral"
                 value={umbralCoupling}
                 type="text"
-                onChange={(e) => setUmbralCoupling(e.target.value)}
+                onChange={(e) => {
+                  e.preventDefault();
+                  setUmbralCoupling(Number(e.target.value));
+                }}
               />
               <label className="input-label">Umbral Acoplamiento</label>
             </div>
@@ -227,75 +245,57 @@ const EdgesTable = () => {
                 name="umbral"
                 value={umbral}
                 type="text"
-                onChange={(e) => setUmbral(e.target.value)}
+                onChange={(e) => {
+                  e.preventDefault();
+                  setUmbral(Number(e.target.value));
+                }}
               />
               <label className="input-label">Umbral Q</label>
             </div>
           </div>
-
+          <div>
+            <Button onClick={async () => {
+              await combineMetrics(setRender, render);
+              // console.log("edgesDos")
+              // console.log(edgesDos);
+              // setRender(!render)
+              }}>Diferente</Button>
+          </div>
           <div className="btn-total">
-            <Button onClick={() => {
-              calculateTotal();
-            }
-            }>
-              Calcular Hipótesis
+            <Button
+              onClick={() => {
+                ManageMetrics(user, selectedProject, umbralName);
+              }}
+            >
+              Calcular Metricas
             </Button>
           </div>
-
-        </form >
+        </form>
       </div>
       <div className="total-sum">
         <p>
           Total:<span>{total}</span>
         </p>
       </div>
-      {
-        sum > 100 ?
-          <Alert severity="error">
-            <AlertTitle>Error</AlertTitle>
-            El total de los pesos no puede ser mayor a 100 — <strong>Vuelve a calcular!</strong>
-          </Alert>
-          :
-          <Alert severity="success">
-            <AlertTitle>Calculo Exitoso</AlertTitle>
-          </Alert>
-      }
-      {
-        !loader ? (
-          <DataGrid rows={edgesDos} columns={columns1} pageSize={10} />
-        ) : (
-          <Loader />
-        )
-      }
-    </div >
+      {sum > 100 ? (
+        <Alert severity="error">
+          <AlertTitle>Error</AlertTitle>
+          El total de los pesos no puede ser mayor a 100 —{' '}
+          <strong>Vuelve a calcular!</strong>
+        </Alert>
+      ) : (
+        <Alert severity="success">
+          <AlertTitle>Calculo Exitoso</AlertTitle>
+        </Alert>
+      )}
+      {!loader ? (
+        <DataGrid rows={edgesDos} columns={columns1} pageSize={10} />
+      ) : (
+        <Loader />
+      )}
+    </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-//   return (
-//     <div style={{ height: 800, width: "100%" }}>
-//       <button onClick={() => ManageMetrics(user, selectedProject, setReloadSidebar)
-//       }>
-//         Calcular Metricas
-//       </button>
-//       {!loader ? (
-//         <DataGrid rows={edgesDos} columns={columns1} pageSize={10} />
-//       ) : (
-//         <Loader />
-//       )}
-//     </div>
-//   );
-// };
 
 export default EdgesTable;
 
