@@ -8,6 +8,8 @@ import Switch from "@material-ui/core/Switch";
 
 import AppContext from "../../auth/context/context";
 import CytoscapeComponent from "react-cytoscapejs";
+// import cytoscape from 'cytoscape';
+// import cise from 'cytoscape-cise';
 import Loader from "../Loader/Loader";
 import nodesHelper from "../../helpers/nodes/nodes";
 
@@ -16,15 +18,19 @@ import nodesHelper from "../../helpers/nodes/nodes";
  * de la arquitectura seleccionada
  */
 const Content = () => {
+  // cytoscape.use( cise );
   const classes = useStyles();
   const [checked, setChecked] = useState(false);
   const [elementos, setElementos] = useState();
   const [load, setLoad] = useState(false);
+  const [composite2, setComposite2] = useState(false);
+  const [listT, setListT] = useState({nodes: ''});
   const {
     selectedProject,
     cy, setCy,
     selectedNodes, setSelectedNodes,
     setSelectionModel,
+    composite
   } = useContext(AppContext);
 
     /**
@@ -46,10 +52,20 @@ const Content = () => {
     }
   }
 
+
   /** Creacion de capa de estilos para el grafo segun Cytoscape */
   var state = {
     layout: {
-      name: "circle",
+      name: 'circle',
+      fit: true,
+      padding: 30,
+      avoidOverlap: true,
+      nodeDimensionsIncludeLabels: true,
+      avoidOverlapPadding: 150,
+    },
+    layout2: {
+      name: 'circle',
+      clusters: listT,
       fit: true,
       padding: 30,
       avoidOverlap: true,
@@ -58,37 +74,72 @@ const Content = () => {
     },
     stylesheet: [
       {
-        selector: "node",
+        selector: 'node',
         style: {
-          content: "data(id)",
-          "font-size": 20,
-          shape: "round-rectangle",
-          "text-wrap": "wrap",
-          "text-max-width": 80,
-          "text-valign": "center",
-          "text-outline-color": "#18202C",
+          content: 'data(id)',
+          'font-size': 20,
+          shape: 'round-rectangle',
+          'text-wrap': 'wrap',
+          'text-max-width': 80,
+          'text-valign': 'center',
+          'text-outline-color': '#18202C',
           width: 270,
-          color: "white",
+          color: 'white',
           height: 40,
-          "background-color": "#18202C",
+          'background-color': 'data(bg)',
         },
       },
       {
-        selector: "edge",
+        selector: 'edge',
         style: {
           content: getEdgeLabel,
           width: 4,
-          "font-size": 20,
-          "curve-style": "bezier",
-          "edge-text-rotation": "autorotate",
-          "target-arrow-shape": "triangle-tee",
-          "text-valign": "top",
-          "text-halign": "center",
-          color: "#fff",
-          "text-outline-color": "#18202C",
-          "text-outline-width": 3,
-          "line-color": "#18202C",
-          "target-arrow-color": "#18202C",
+          'font-size': 20,
+          'curve-style': 'bezier',
+          'edge-text-rotation': 'autorotate',
+          'target-arrow-shape': 'triangle-tee',
+          'text-valign': 'top',
+          'text-halign': 'center',
+          color: '#fff',
+          'text-outline-color': '#18202C',
+          'text-outline-width': 3,
+          'line-color': '#18202C',
+          'target-arrow-color': '#18202C',
+        },
+      },
+    ],
+    stylesheet2: [
+      {
+        selector: 'node',
+        style: {
+          content: 'data(id)',
+          'font-size': 20,
+          shape: 'round-rectangle',
+          'text-wrap': 'wrap',
+          'text-max-width': 80,
+          'text-valign': 'center',
+          width: 270,
+          color: 'white',
+          height: 40,
+          'background-color': 'data(bg)',
+        },
+      },
+      {
+        selector: 'edge',
+        style: {
+          content: getEdgeLabel,
+          width: 4,
+          'font-size': 20,
+          'curve-style': 'bezier',
+          'edge-text-rotation': 'autorotate',
+          'target-arrow-shape': 'triangle-tee',
+          'text-valign': 'top',
+          'text-halign': 'center',
+          color: '#fff',
+          'text-outline-color': '#18202C',
+          'text-outline-width': 3,
+          'line-color': '#18202C',
+          'target-arrow-color': '#18202C',
         },
       },
     ],
@@ -125,17 +176,6 @@ const Content = () => {
       cy,
       setSelectionModel
     );
-    // cy.animate(
-    //   {
-    //     fit: {
-    //       eles: cy.getElementById(nodeId),
-    //       padding: 30,
-    //     },
-    //   },
-    //   {
-    //     duration: 100,
-    //   }
-    // );
     evt.preventDefault();
   };
 
@@ -145,7 +185,6 @@ const Content = () => {
    */
   const unselectNodeHandler = (evt) => {
     const nodeId = evt["target"]["_private"]["data"].id;
-    // cy.fit();
     nodesHelper.removeNode(
       nodeId,
       selectedNodes,
@@ -171,10 +210,25 @@ const Content = () => {
     }
   }, [checked, cy]);
 
+  // useEffect(() => {
+  //   console.log("ENTRO")
+  //   if (composite) {
+  //     let composite_components = []
+  //     elementos.list_t.map((item) => {
+  //       composite_components.push(item.composite_component);
+  //     });
+  //     setListT(composite_components);
+  //     setComposite2(true)
+  //   }
+  // }, [composite]);
+
+  useEffect(()=>{
+
+  },[composite])
+
   useEffect(() => {
     setLoad(true);
     setElementos(selectedProject.elements);
-    //console.log(selectedProject.elements);
   }, [selectedProject]);
 
   useEffect(() => {
@@ -200,7 +254,7 @@ const Content = () => {
               }
               labelPlacement="start"
               style={{ marginRight: 5 }}
-              label = ""
+              label=""
             />
           </div>
 
@@ -218,7 +272,23 @@ const Content = () => {
             zoom={0.5}
           />
         </div>
-      ) : null}
+      )
+      // : elementos && composite2 ? (
+      //   <CytoscapeComponent
+      //       className="component"
+      //       cy={(cyt) => {
+      //         setCy(cyt);
+      //       }}
+      //       elements={CytoscapeComponent.normalizeElements(elementos)}
+      //       id="component"
+      //       layout={state.layout2}
+      //       maxZoom={2}
+      //       pan={{ x: 150, y: 30 }}
+      //       stylesheet={state.stylesheet2}
+      //       zoom={0.5}
+      //     />
+      // )
+      : null }
     </>
   );
 };

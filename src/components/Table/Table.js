@@ -8,6 +8,8 @@ import IconButton from "@material-ui/core/IconButton";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import MenuIcon from "@material-ui/icons/Menu";
 import "./table.css"
+import RemoveIcon from '@material-ui/icons/Remove';
+import AddIcon from '@material-ui/icons/Add';
 
 import TableItem from "../TableItem/TableItem";
 
@@ -19,6 +21,7 @@ import TableItem from "../TableItem/TableItem";
 const Table = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
+  const [resizedDrawer, setResizedDrawer] = useState(false);
 
   /**
    * Cambiar estado del drawer
@@ -45,64 +48,87 @@ const Table = () => {
         anchor="bottom"
         open={open}
         classes={{
-          paper: classes.drawerPaper,
+          paper: resizedDrawer ? classes.drawerPaper : classes.drawerPaperMini,
         }}
       >
         <div className={classes.drawerHeader}>
+          <IconButton aria-label="add" size="large">
+            {resizedDrawer ? (
+              <RemoveIcon
+                fontSize="inherit"
+                color="primary"
+                onClick={(e) => {
+                  setResizedDrawer(!resizedDrawer);
+                }}
+              />
+            ) : (
+              <AddIcon
+                fontSize="inherit"
+                color="primary"
+                onClick={(e) => {
+                  setResizedDrawer(!resizedDrawer);
+                }}
+              />
+            )}
+          </IconButton>
           <IconButton onClick={handleDrawer}>
             <KeyboardArrowDownIcon />
           </IconButton>
         </div>
         <Divider />
-        <TableItem />
+        <TableItem closeDrawable={(value) => setOpen(value)} />
       </Drawer>
     </div>
-  )
+  );
 };
 
 /** Creacion de capa de estilos para el componente */
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: "flex",
+    display: 'flex',
   },
   menuButton: {
     marginRight: theme.spacing(2),
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     right: 0,
     // marginRight: 25,
-    backgroundColor: "var(--primaryDark)",
+    backgroundColor: 'var(--primaryDark)',
     borderEndEndRadius: 0,
     borderEndStartRadius: 0,
-    transition: "0.5s",
+    transition: '0.5s',
     boxShadow:
-      "0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)",
-    color: "white",
-    "&:hover": {
-      color: "var(--primaryDark)",
+      '0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)',
+    color: 'white',
+    '&:hover': {
+      color: 'var(--primaryDark)',
     },
   },
   hide: {
-    transition: "1s",
-    display: "none",
+    transition: '1s',
+    display: 'none',
   },
   drawer: {
-    width: '50%',
     flexShrink: 0,
   },
   drawerPaper: {
     boxShadow:
-      "0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)",
-
+      '0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)',
     width: '70%',
+    height: '100%',
+  },
+  drawerPaperMini: {
+    boxShadow:
+      '0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)',
+    width: '50%',
     height: '100%',
   },
   drawerHeader: {
     height: 40,
-    display: "flex",
-    alignItems: "center",
+    display: 'flex',
+    alignItems: 'center',
     padding: theme.spacing(0, 1),
-    justifyContent: "flex-end",
+    justifyContent: 'space-between',
   },
 }));
 

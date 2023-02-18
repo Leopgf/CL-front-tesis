@@ -217,6 +217,7 @@ const getNodeData = (selectedProject) => {
     name: node.data.name,
     module: node.data.module,
     incomompleteProperties: node.data.incomompleteProperties,
+    composite: node.data.composite ?? '-',
   }));
 };
 
@@ -227,9 +228,6 @@ const getNodeData = (selectedProject) => {
  * @returns Arreglo de objetos de tipo aristas
  */
 const getRelationData = (selectedProject) => {
-  console.log("selectedProject.elements.edges");
-  console.log(selectedProject.elements.edges);
-  console.log(selectedProject.elements.edges[0].metrics.overall_score_q);
   return selectedProject.elements.edges?.map((edge, index) => {
     return {
       id: index,

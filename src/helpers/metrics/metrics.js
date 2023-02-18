@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import {
   putMetrics,
   combineMetrics,
-  compositeComponets,
+  compositeComponents,
 } from '../../api/metrics/metrics.js';
 
 import AppContext from "../../auth/context/context.js"
@@ -40,7 +40,7 @@ const ManageMetrics = async (user, selectedProject, umbralName) => {
   }
 
   const ManageCreateCompositeComponent = async (user, selectedProject, umbral_q) => {
-    await compositeComponets (
+    await compositeComponents (
       user,
       selectedProject.projectIndex,
       selectedProject.arcIndex,

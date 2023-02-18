@@ -18,6 +18,7 @@ function App() {
   const [selectionModel, setSelectionModel] = useState([]);
   const [reloadSidebar, setReloadSidebar] = useState(false);
   const [cy, setCy] = useState();
+  const [composite, setComposite] = useState(false);
   /**
    * Restaurar usuario si ya se ha iniciado sesión
    */
@@ -33,13 +34,14 @@ function App() {
   return (
     <>
       <GlobalStyle />
-      <AppContext.Provider value={{ 
-          user, setUser, 
+      <AppContext.Provider value={{
+          user, setUser,
           selectedProject, setSelectedProject,
-          selectedNodes, setSelectedNodes, 
+          selectedNodes, setSelectedNodes,
           reloadSidebar, setReloadSidebar,
           selectionModel, setSelectionModel,
           cy, setCy,
+          composite, setComposite,
         }}>
         <Router>
           <Switch>

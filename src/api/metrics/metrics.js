@@ -41,7 +41,7 @@ const putMetrics = async (user, projectIndex, arcIndex, verIndex, name_ressembla
          ver_index: verIndex,
          name_ressemblance_umbral: name_ressemblance_umbral,
    }
-
+   console.log('Metricass', putMetrics)
    const token = jwt(putMetrics, 'secret');
 
     try {
@@ -74,11 +74,11 @@ const combineMetrics = async (user, projectIndex, arcIndex, verIndex, weighing) 
     });
     return res.data
   }catch (err){
-    return err.res.status
+    return err?.res?.status
   }
 }
 
-const compositeComponets = async(
+const compositeComponents = async(
   user,
   projectIndex,
   arcIndex,
@@ -100,10 +100,10 @@ const compositeComponets = async(
     console.log(res.data)
     return res.data
   }catch (err){
-    return err.res.status
+    return err?.res?.status
   };
 }
 
 export {
-    putMetrics, combineMetrics, compositeComponets
+    putMetrics, combineMetrics, compositeComponents
 }

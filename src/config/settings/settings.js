@@ -1,11 +1,11 @@
 const settings = {
   staging: {
     apiUrl: 'http://127.0.0.1:8000/',
-    // apiUrl: "https://tesis-backend-final.herokuapp.com",
+    // apiUrl: 'https://cl-tesis-back.herokuapp.com',
   },
   production: {
-    //apiUrl: "https://tesis-back-end.herokuapp.com/"
-    apiUrl: 'http://127.0.0.1:8000/',
+    apiUrl: 'https://cl-tesis-back.herokuapp.com',
+    // apiUrl: 'http://127.0.0.1:8000/',
   },
 };
 const getCurrentSettings = (flag) => {

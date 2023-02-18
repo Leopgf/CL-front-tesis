@@ -133,4 +133,4 @@ const addFile = (file, formData) => {
   file.remove();
 };
 
-export { manageElementsSubmit, manageElementsUpdate };
+export { manageElementsSubmit, manageElementsUpdate, manageUpdatedResponse };
