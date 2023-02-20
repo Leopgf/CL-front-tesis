@@ -9,7 +9,7 @@ import Loader from "../../Loader/Loader";
 import nodeHelper from "../../../helpers/nodes/nodes";
 import axios from "axios";
 import {postUpdatedElements} from "../../../api/elements/elements";
-import {manageUpdatedResponse} from "../../../helpers/elements/elements";
+import {manageElementsUpdate, manageUpdatedResponse} from "../../../helpers/elements/elements";
 import Button from "@material-ui/core/Button";
 
 /**
@@ -28,6 +28,13 @@ const CompositeComponentTable = (props) => {
         cy,
     } = useContext(AppContext);
     let [loader, setLoader] = useState(true);
+    const [loadingComponents, setLoadingComponents] = useState(false);
+    const [render, setRender] = useState(false);
+
+    useEffect(() => {
+        manageElementsUpdate(user, selectedProject, setSelectedProject);
+
+    }, [render]);
 
     let rows = selectedProject.elements.list_t.map((list, index) => {
         return {
@@ -179,51 +186,82 @@ const CompositeComponentTable = (props) => {
     }
 
     return (
-        <div style={{height: '100vh', width: '100%'}}>
-            {!loader ? (
-                <DataGrid
-                    rows={rows}
-                    getEstimatedRowHeight={() => 300}
-                    getRowHeight={() => 'auto'}
-                    components={{Toolbar: CustomToolbar}}
-                    sx={{
-                        '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': {
-                            py: 1,
-                        },
-                        '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': {
-                            py: '15px',
-                        },
-                        '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': {
-                            py: '22px',
-                        },
-                    }}
-                    columns={columns}
-                    pageSize={50}
-                    onCellClick={(params) => {
-                        nodeHelper.manageCellClick(
-                            params.row.name,
-                            selectedNodes,
-                            setSelectedNodes,
-                            cy,
-                            setSelectionModel
-                        );
-                    }}
-                    onColumnHeaderClick={(param) => {
-                        if (param.field === '__check__') {
-                            nodeHelper.manageCheckSelection(
+        <>
+            <div>
+
+                {!loadingComponents ? (
+                    <Button
+                        className="btn-total"
+                        onClick={async () => {
+                            setLoadingComponents(true);
+                            await axios.put('/create_cc_board/', {
+                                data: {
+                                    user_id: user.uid,
+                                    project_index: selectedProject.projectIndex,
+                                    arch_index: selectedProject.arcIndex,
+                                    ver_index: selectedProject.verIndex,
+                                }
+
+                            });
+                            setRender(!render)
+                            setLoadingComponents(false);
+                        }}
+                    >
+                        Calcular Interfaces
+                    </Button>
+                ) : (
+                    <Loader />
+                )}
+            </div>
+            <div style={{ height: '100vh', width: '100%' }}>
+                {!loader ? (
+
+
+                    <DataGrid
+                        rows={rows}
+                        getEstimatedRowHeight={() => 300}
+                        getRowHeight={() => 'auto'}
+                        components={{ Toolbar: CustomToolbar }}
+                        sx={{
+                            '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': {
+                                py: 1,
+                            },
+                            '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': {
+                                py: '15px',
+                            },
+                            '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': {
+                                py: '22px',
+                            },
+                        }}
+                        columns={columns}
+                        pageSize={50}
+                        onCellClick={(params) => {
+                            nodeHelper.manageCellClick(
+                                params.row.name,
                                 selectedNodes,
                                 setSelectedNodes,
                                 cy,
                                 setSelectionModel
                             );
-                        }
-                    }}
-                    selectionModel={selectionModel}
-                />
-            ) : (
-                <Loader/>
-            )}
-        </div>
+                        }}
+                        onColumnHeaderClick={(param) => {
+                            if (param.field === '_check_') {
+                                nodeHelper.manageCheckSelection(
+                                    selectedNodes,
+                                    setSelectedNodes,
+                                    cy,
+                                    setSelectionModel
+                                );
+                            }
+                        }}
+                        selectionModel={selectionModel}
+                    />
+                ) : (
+                    <Loader />
+                )}
+            </div>
+        </>
+
     );
 };
 

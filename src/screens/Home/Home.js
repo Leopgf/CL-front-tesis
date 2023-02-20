@@ -14,7 +14,7 @@ import Swal from "sweetalert2";
 import AppContext from "../../auth/context/context";
 import {googleAuth} from "../../firebase/googleAuth";
 import {postLogin} from "../../api/login/login";
-import Vista from "./Vista";
+import UML from "../../components/UML/UML";
 
 /** Componente que representa la página
  *  principal de navegación
@@ -115,7 +115,7 @@ function Home() {
                 {selectedProject ? (
                     <div>
                         {showUml ?
-                            <Vista/>
+                            <UML setShowUml={(value)=> setShowUml(value)}/>
                             :
                             <Content/>
                         }

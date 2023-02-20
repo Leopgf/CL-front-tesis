@@ -33,6 +33,7 @@ const EdgesTable = () => {
     { field: 'source', headerName: 'Origen', width: 180 },
     { field: 'target', headerName: 'Destino', width: 180 },
     { field: 'relation', headerName: 'Relación', width: 150 },
+    { field: 'index', headerName: 'Index', width: 150 },
     { field: 'coupling', headerName: 'Coupling', width: 150 },
     { field: 'abstractness', headerName: 'Abstracción', width: 180 },
     { field: 'instability', headerName: 'Inestabilidad', width: 180 },
@@ -238,15 +239,15 @@ const EdgesTable = () => {
                   setLoadingComponents(true);
                   await combineMetrics(setRender, render);
                   await calculatelistas();
-                  await axios.put('/create_cc_board/', {
-                   data: {
-                    user_id: user.uid,
-                    project_index: selectedProject.projectIndex,
-                    arch_index: selectedProject.arcIndex,
-                    ver_index: selectedProject.verIndex,
-                   }
-
-                  });
+                  // await axios.put('/create_cc_board/', {
+                  //  data: {
+                  //   user_id: user.uid,
+                  //   project_index: selectedProject.projectIndex,
+                  //   arch_index: selectedProject.arcIndex,
+                  //   ver_index: selectedProject.verIndex,
+                  //  }
+                  //
+                  // });
                   setEnable(true);
                   setLoadingComponents(false);
                 }}

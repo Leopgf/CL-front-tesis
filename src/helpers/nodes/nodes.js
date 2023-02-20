@@ -235,6 +235,7 @@ const getRelationData = (selectedProject) => {
       source: edge.data.source,
       target: edge.data.target,
       relation: getRelationType(edge.scratch.relation),
+      index: edge.scratch.index ? edge.scratch.index : "",
       dms: edge.hasOwnProperty('metrics')
         ? edge.metrics.DMS.value
         : 'No Calculado',
