@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
-import {DiagramComponent} from "@syncfusion/ej2-react-diagrams";
+import {DiagramComponent, PortVisibility} from "@syncfusion/ej2-react-diagrams";
 import AppContext from "../../auth/context/context";
 import Swal from "sweetalert2";
 
@@ -12,7 +12,7 @@ function UML({setShowUml}) {
 
     useEffect(() => {
         renderNodesUML()
-        renderConnectorUML()
+        // renderConnectorUML()
     }, [])
 
     useEffect(() => {
@@ -24,30 +24,48 @@ function UML({setShowUml}) {
         selectedProject.elements.list_t.map((node) => {
             let members = []
             node.composite_component.map((component) => {
-                let member = {
-                    name: component
-                }
-                members.push(member)
+                // let member = {
+                //     name: component
+                // }
+                members.push(component + "\n")
             })
             let object = {
                 id: node.name,
-                shape: {
-                    type: 'UmlClassifier',
-                    enumerationShape: {
-                        name: node.name,
-                        members: members
-                    },
-                    classifier: 'Enumeration'
+                style: {
+                    fill: 'white',
+                    strokeColor: '#000'
                 },
+                annotations: [{
+                    content: node.name + "\n" + members.toString().replaceAll(",", "")
+                }],
                 offsetX: node.offsetX,
-                offsetY: node.offsetY
+                offsetY: node.offsetY,
+                ports: [{
+                    id: "port" + node.name,
+                    offset: {
+                        x: 1,
+                        y: 0.5
+                    },
+                    visibility: PortVisibility.Visible,
+                    //Set the style for the port
+                    style: {
+                        fill: 'red',
+                        strokeWidth: 2,
+                        strokeColor: 'black'
+                    },
+                    width: 12,
+                    height: 12,
+                    // Sets the shape of the port as Circle
+                    shape: 'Circle'
+                }]
             }
             nodos.push(object)
         })
         setNodes(nodos)
+        renderConnectorUML(nodos)
     }
 
-    const renderConnectorUML = () => {
+    const renderConnectorUML = (nodesData) => {
         let conectores = []
         const nodesStatic = selectedProject.elements.list_t
         selectedProject.elements.list_t.map((node) => {
@@ -56,9 +74,6 @@ function UML({setShowUml}) {
             node.provided_interfaces?.map((provided) => {
                 nodesStatic.map((nodos) => {
                     nodos.required_interfaces?.map((required) => {
-                        console.log("REQUIRED")
-                        console.log(required)
-                        console.log(provided)
                         if (required == provided) {
                             let exist = false
                             conectores?.map((connect) => {
@@ -67,14 +82,17 @@ function UML({setShowUml}) {
                                 }
                             })
                             if (!exist) {
-                                console.log("PASO?")
-                                console.log(node.offsetX, node.offsetY)
-                                console.log(nodos.offsetX, nodos.offsetY)
+                                let nodoSource = nodesData.find((nodeData)=> nodeData.id == node.name)
+                                let nodoTarget = nodesData.find((nodeData)=> nodeData.id == nodos.name)
                                 let object = {
                                     id: "connector" + conectores.length,
                                     //Define connector start and end points
                                     sourcePoint: {x: node.offsetX, y: node.offsetY},
                                     targetPoint: {x: nodos.offsetX, y: nodos.offsetY},
+                                    sourceID: nodoSource.id,
+                                    targetID: nodoTarget.id,
+                                    sourcePortID: nodoSource.ports[0].id,
+                                    targetPortID: nodoTarget.ports[0].id,
                                     type: "Straight",
                                     shape: {
                                         type: "UmlClassifier",
